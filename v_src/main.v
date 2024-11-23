@@ -32,7 +32,31 @@ fn main() {
 		albedo: Color.new(0.8, 0.6, 0.2)
 	)
 
-	world.add(Hittable.new)
+	world.add(Hittable{
+		shape: Shape.sphere,
+		center: Point3.new(0.0, -100.5, -1.0),
+		radius: 100.0
+		mat: material_ground
+	})
+	world.add(Hittable{
+		shape: Shape.sphere,
+		center: Point3.new(0.0, 0.0, -1.2)
+		radius: 0.5, 
+		mat: material_center
+	})
+	world.add(Hittable{
+		shape: Shape.sphere,
+		center: Point3.new(1.0, 0.0, -1.0)
+		radius: 0.5,
+		mat: material_left
+	})
+	world.add(Hittable{
+		shape: Shape.sphere,
+		center: Point3.new(1.0, 0.0, -1.0)
+		radius: 0.5,
+		mat: material_right
+	})
+
 
 	
 	mut cam := Camera.new()

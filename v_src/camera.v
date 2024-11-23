@@ -1,4 +1,5 @@
 module main
+import gfx
 
 @[noinit]
 struct Camera {
@@ -78,7 +79,7 @@ fn (mut c Camera) initialize() {
 
 fn (mut c Camera) render(world Hittable_List) {
 	c.initialize()
-	print("P3\n${c.image_width} ${c.image_height}\n255\n")
+	mut image := gfx.Image.new(gfx.Size2i.new(c.image_width, c.image_height))
 	for j in 0..c.image_height {
 		for i in 0..c.image_width{
 			mut pixel_color := Color.new(0,0,0)
@@ -86,9 +87,11 @@ fn (mut c Camera) render(world Hittable_List) {
 				r := c.get_ray(i, j)
 				pixel_color = pixel_color + c.ray_color(r, c.max_depth, world)
 			}
-			write_color(pixel_color.scale(c.pixel_samples_scale))
+			pixel_color = pixel_color.scale(c.pixel_samples_scale)
+			image.set_xy(i, j, gfx.Color.new(pixel_color.x(), pixel_color.y(), pixel_color.z()))
 		}
 	}
+	image.save_png("image.png")
 }
 
 

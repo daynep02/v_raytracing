@@ -33,7 +33,7 @@ fn (v Vec3) length_squared() f64 {
 
 fn (v Vec3) near_zero() bool{
 	s := 1e-8
-	return math.abs(v.e[0]) < s && math.abs(v.e[1]) < s && math.abs(v.e[2]) < s
+	return (math.abs(v.e[0]) < s && math.abs(v.e[1]) < s && math.abs(v.e[2]) < s)
 }
 
 @[inline]
@@ -88,8 +88,8 @@ fn random_unit_vector() Vec3 {
 	for {
 		p := Vec3.random_in_range(-1, 1)
 		lensq := p.length_squared()
-		if lensq <= 1 {
-			return p.scale(math.sqrt(lensq))
+		if 1e-160 < lensq && lensq <= 1 {
+			return p.scale(1.0 / math.sqrt(lensq))
 		}
 	}
 	return Vec3{}
