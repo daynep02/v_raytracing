@@ -116,3 +116,14 @@ fn refract(uv Vec3, n Vec3, etai_over_etat f64) Vec3{
 	r_out_parallel := n.scale(-math.sqrt(math.abs(1.0 - r_out_perp.length_squared())))
 	return (r_out_perp + r_out_parallel)
 }
+
+@[inline]
+fn random_in_unit_disk() Vec3 {
+	for {
+		p:= Vec3.new(random_double_bound(-1, 1), random_double_bound(-1, 1), 0.0)
+		if p.length_squared() < 1{
+			return p
+		}
+	}
+	return Vec3{}
+}

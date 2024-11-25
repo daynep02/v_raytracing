@@ -44,7 +44,7 @@ fn (l Material) scatter_lambertian(r_in Ray, rec Hit_Record, mut attenuation Col
 	if scatter_direction.near_zero() {
 		scatter_direction = rec.normal
 	}
-	scattered = Ray.new(rec.p, scatter_direction)
+	scattered = Ray.new(rec.p, scatter_direction, tm: r_in.time())
 	attenuation = l.albedo
 	return true
 }
@@ -52,7 +52,7 @@ fn (l Material) scatter_lambertian(r_in Ray, rec Hit_Record, mut attenuation Col
 fn (m Material) scatter_metal(r_in Ray, rec Hit_Record, mut attenuation Color, mut scattered Ray) bool {
 	mut reflected := reflect(r_in.direction(), rec.normal) 
 	reflected = unit_vector(reflected) + random_unit_vector().scale(m.fuzz)
-	scattered = Ray.new(rec.p, reflected)
+	scattered = Ray.new(rec.p, reflected, tm: r_in.time())
 	attenuation = m.albedo
 	return (scattered.direction().dot(rec.normal) > 0)
 }
@@ -68,7 +68,7 @@ fn (m Material) scatter_dielectric(r_in Ray, rec Hit_Record, mut attenuation Col
 
 	direction := if (ri * sin_theta) > 1.0 || m.dielectric_reflectence(cos_theta, ri) > random_double() {reflect(unit_direction, rec.normal)} else {refract(unit_direction, rec.normal, ri)}
 
-	scattered = Ray.new(rec.p, direction)
+	scattered = Ray.new(rec.p, direction, tm: r_in.time())
 	return true
 }
 

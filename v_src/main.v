@@ -1,7 +1,5 @@
 module main
 
-
-
 fn main() {
 
 	// Image
@@ -9,65 +7,94 @@ fn main() {
 
 	//World
 
+
 	mut world := Hittable_List{}
 
-
-	material_ground := Material.new(
+	ground_material := Material.new(
 		mat: EMaterial.lambertian
-		albedo: Color.new(0.8, 0.8, 0.0)
-	)	
-
-	material_center := Material.new(
-		mat: EMaterial.lambertian
-		albedo: Color.new(0.1, 0.2, 0.5)
+		albedo: Color.new(0.5, 0.5, 0.5)
 	)
 
-	material_left := Material.new(
+	world.add(Hittable.new(Point3.new(0.0, -1000, 0.0),
+		radius: 1000.0,
+		mat: ground_material
+	 ))
+
+	for a in -11..11 {
+		for b in -11..11{
+			choose_mat := random_double()
+			center := Point3.new(a + 0.9*random_double(), 0.2, b + 0.9*random_double())
+
+			if (center-Point3.new(4.0, 0.2, 0.0)).length() > 0.9 {
+
+				if choose_mat < 0.8 {
+					albedo := Color.random() * Color.random()
+					sphere_material := Material.new(
+						mat: EMaterial.lambertian
+						albedo: albedo
+					)
+					world.add(Hittable.new(center,
+						center2: center + Vec3.new(0, random_double_bound(0, 0.5), 0)
+						mat: sphere_material
+					))
+				}
+				else if choose_mat < 0.95 {
+					albedo := Color.random_in_range(0.5, 1.0)
+					fuzz := random_double_bound(0.0, 0.5)
+
+					sphere_material := Material.new(
+						mat: EMaterial.metal
+						albedo: albedo
+						fuzz: fuzz
+					) 
+
+					world.add(Hittable.new(center,
+						radius: 0.2,
+						mat: sphere_material
+					 ))
+				}
+				else {
+					sphere_material := Material.new(
+						mat: EMaterial.dielectric
+						refraction_index: 1.5
+					)
+					world.add(Hittable.new(center,
+						radius: 0.2,
+						mat: sphere_material
+					 ))
+				}
+			}
+		}
+	}
+
+	material1 := Material.new(
 		mat: EMaterial.dielectric
-		refraction_index: 1.50
+		refraction_index: 1.5
+	)
+	world.add(Hittable.new(Point3.new(0.0, 1.0, 0.0),
+		radius: 1.0,
+		mat: material1
+	 ))
+
+	material2 := Material.new(
+		mat: EMaterial.lambertian
+		albedo: Color.new(0.4, 0.2, 0.1)
 	)
 
-	material_right := Material.new(
+	world.add(Hittable.new(Point3.new(-4.0, 1.0, 0.0),
+		radius: 1.0,
+		mat: material2
+	 ))
+
+	material3 := Material.new(
 		mat: EMaterial.metal
-		albedo: Color.new(0.8, 0.6, 0.2)
-		fuzz: 1.0
+		albedo: Color.new(0.4, 0.2, 0.1),
+		fuzz: 0.0
 	)
-
-	material_bubble := Material.new(
-		mat: EMaterial.dielectric,
-		refraction_index: 1.00/1.50
-	)
-
-	world.add(Hittable{
-		shape: Shape.sphere,
-		center: Point3.new(0.0, -100.5, -1.0),
-		radius: 100.0
-		mat: material_ground
-	})
-	world.add(Hittable{
-		shape: Shape.sphere,
-		center: Point3.new(0.0, 0.0, -1.2)
-		radius: 0.5, 
-		mat: material_center
-	})
-	world.add(Hittable{
-		shape: Shape.sphere,
-		center: Point3.new(-1.0, 0.0, -1.0)
-		radius: 0.5,
-		mat: material_left
-	})
-	world.add(Hittable{
-		shape: Shape.sphere,
-		center: Point3.new(-1.0, 0.0, -1.0)
-		radius: 0.4,
-		mat: material_bubble
-	})
-	world.add(Hittable{
-		shape: Shape.sphere,
-		center: Point3.new(1.0, 0.0, -1.0)
-		radius: 0.5,
-		mat: material_right
-	})
+	world.add(Hittable.new(Point3.new(4.0, 1.0, 0.0),
+		radius: 1.0,
+		mat: material3
+	 ))
 
 
 	
@@ -75,10 +102,18 @@ fn main() {
 
 	cam.aspect_ratio = 16.0/9.0
 	cam.image_width = 400
-	cam.samples_per_pixel = 100
-	cam.max_depth = 50 
+	cam.samples_per_pixel = 3
+	cam.max_depth = 30 
 
-	cam.render(world)
+	cam.vfov = 20
+	cam.lookfrom = Point3.new(13.0, 2.0, 3.0)
+	cam.lookat 	= Point3.new(0.0, 0.0, 0.0)
+	cam.vup = Vec3.new(0.0, 1.0, 0.0) 
+
+	cam.defocus_angle = 0.6
+	cam.focus_dist = 10.0
+
+	cam.render(world).save_png("image3.png")
 
 	//camera
 

@@ -10,23 +10,39 @@ mut:
 
 enum Shape {
 	sphere
-	e
 }
 
+@[noinit]
 struct Hittable {
-	shape Shape = Shape.e
-	center Point3 = Point3{} 
-	radius f64 = 0.0
-	mat Material = Material{}
+	shape Shape
+	center Ray
+	radius f64
+	mat Material
 }
 
+@[params]
+struct Hittable_Params  {
+	shape Shape = Shape.sphere
+	center2 Vec3 = Vec3.new(0,0,0)
+	mat Material = Material.new(
+		mat: EMaterial.lambertian
+		albedo: Color.new(0.5, 0.5, 0.5)
+	)
+	radius f64 = 0.5
+}
+
+
+fn Hittable.new(center Point3, params Hittable_Params) Hittable{
+	return match params.shape{
+		.sphere{ new_sphere(center, params)}	
+	}
+}
 
 fn (h Hittable) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 	match h.shape {
 		.sphere {
 			return h.hit_sphere(r, ray_t, mut rec)
 		}
-		else {return false}
 	}
 }
 
