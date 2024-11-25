@@ -23,13 +23,13 @@ fn main() {
 	)
 
 	material_left := Material.new(
-		mat: EMaterial.metal
-		albedo: Color.new(0.8, 0.8, 0.8)
+		refraction_index: 1.50
 	)
 
 	material_right := Material.new(
 		mat: EMaterial.metal
 		albedo: Color.new(0.8, 0.6, 0.2)
+		fuzz: 1.0
 	)
 
 	world.add(Hittable{
@@ -46,7 +46,7 @@ fn main() {
 	})
 	world.add(Hittable{
 		shape: Shape.sphere,
-		center: Point3.new(1.0, 0.0, -1.0)
+		center: Point3.new(-1.0, 0.0, -1.0)
 		radius: 0.5,
 		mat: material_left
 	})

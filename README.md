@@ -3,8 +3,8 @@
 
 Following _Ray Tracing in One Weeked_, but doing it in VLang!
 
-About halfway through, this is the image so far
+Fixed the error in the previous push, I had one match statement that wasn't returning anything so it made everything dark where an object was intersected
 
-![A bad image that doesn't work](v_src/image.png)
+![A better image that is most of the way through!](v_src/image.png)
 
-It doesn't work well, I'm in the middle of debugging why the shapes are only dark
+This was supposed to add basic refraction, but something seems to have broken. I will continue to work on it.

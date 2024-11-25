@@ -108,3 +108,11 @@ fn random_on_hemisphere(normal Vec3) Vec3{
 fn reflect(v Vec3, n Vec3) Vec3 {
 	return v - n.scale(2 * v.dot(n))
 }
+
+@[inline]
+fn refract(uv Vec3, n Vec3, etai_over_etat f64) Vec3{
+	cos_theta := math.min(uv.negate().dot(n), 1.0)
+	r_out_perp := (n.scale(cos_theta) + uv).scale(etai_over_etat)
+	r_out_parallel := n.scale(-math.sqrt(math.abs(1.0 - r_out_perp.length_squared())))
+	return (r_out_perp + r_out_parallel)
+}
