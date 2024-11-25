@@ -23,6 +23,7 @@ fn main() {
 	)
 
 	material_left := Material.new(
+		mat: EMaterial.dielectric
 		refraction_index: 1.50
 	)
 
@@ -30,6 +31,11 @@ fn main() {
 		mat: EMaterial.metal
 		albedo: Color.new(0.8, 0.6, 0.2)
 		fuzz: 1.0
+	)
+
+	material_bubble := Material.new(
+		mat: EMaterial.dielectric,
+		refraction_index: 1.00/1.50
 	)
 
 	world.add(Hittable{
@@ -49,6 +55,12 @@ fn main() {
 		center: Point3.new(-1.0, 0.0, -1.0)
 		radius: 0.5,
 		mat: material_left
+	})
+	world.add(Hittable{
+		shape: Shape.sphere,
+		center: Point3.new(-1.0, 0.0, -1.0)
+		radius: 0.4,
+		mat: material_bubble
 	})
 	world.add(Hittable{
 		shape: Shape.sphere,

@@ -1,5 +1,6 @@
 module main
 import gfx
+import math
 
 @[noinit]
 struct Camera {
@@ -16,7 +17,7 @@ pub mut:
 	image_width int = 100
 	samples_per_pixel int = 10
 	max_depth int = 10
-
+	vfov f64 = 90.0
 }
 
 
@@ -61,7 +62,9 @@ fn (mut c Camera) initialize() {
 	c.center = Point3.new(0,0,0)
 
 	focal_length := 1.0
-	viewport_height := 2.0
+	theta := degrees_to_radians(c.vfov)
+	h := math.tan(theta/2.0)
+	viewport_height :=  2.0 * h * focal_length
 	viewport_width := viewport_height * (f64(c.image_width)/f64(c.image_height))
 
 	viewport_u := Vec3.new(viewport_width, 0, 0)
@@ -88,7 +91,7 @@ fn (mut c Camera) render(world Hittable_List) {
 				pixel_color = pixel_color + c.ray_color(r, c.max_depth, world)
 			}
 			pixel_color = pixel_color.scale(c.pixel_samples_scale)
-			image.set_xy(i, j, gfx.Color.new(pixel_color.x(), pixel_color.y(), pixel_color.z()))
+			image.set_xy(i, j, gfx.Color.new(linear_to_gamma(pixel_color.x()), linear_to_gamma(pixel_color.y()), linear_to_gamma(pixel_color.z())))
 		}
 	}
 	image.save_png("image.png")

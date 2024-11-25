@@ -1,3 +1,4 @@
+import math
 enum EMaterial {
 	metal
 	lambertian
@@ -14,7 +15,7 @@ struct Material {
 @[params]
 struct Material_Params {
 	mat EMaterial = EMaterial.lambertian
-	albedo Color = Color.new(1.0, 1.0, 0.5)
+	albedo Color = Color.new(1.0, 1.0, 1.0)
 	fuzz f64 = 0.0
 	refraction_index f64 = 1.0
 }
@@ -61,7 +62,18 @@ fn (m Material) scatter_dielectric(r_in Ray, rec Hit_Record, mut attenuation Col
 	ri := if rec.front_face {1.0/m.refraction_index} else {m.refraction_index}
 
 	unit_direction := unit_vector(r_in.direction())
-	refracted := refract(unit_direction, rec.normal, ri)
-	scattered = Ray.new(rec.p, refracted)
+	cos_theta := math.min(unit_direction.negate().dot(rec.normal), 1.0)
+	sin_theta := math.sqrt(1.0 - cos_theta * cos_theta)
+
+
+	direction := if (ri * sin_theta) > 1.0 || m.dielectric_reflectence(cos_theta, ri) > random_double() {reflect(unit_direction, rec.normal)} else {refract(unit_direction, rec.normal, ri)}
+
+	scattered = Ray.new(rec.p, direction)
 	return true
+}
+
+fn (m Material) dielectric_reflectence(cosine f64, refraction_index f64) f64 {
+	r0 := math.pow((1.0 - refraction_index) / (1.0 + refraction_index), 2)
+	return (r0 + (1-r0)* math.pow((1-cosine), 5))
+
 }

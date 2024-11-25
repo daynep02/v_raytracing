@@ -6,7 +6,7 @@ type Color = Vec3
 fn linear_to_gamma(linear_component f64) f64{
 	return if linear_component > 0.0 {math.sqrt(linear_component)} else {0.0}
 }
-
+//unused because I am using the Image class added in the gfx module
 fn write_color(color Color) {
 	r := linear_to_gamma(color.x())
 	g := linear_to_gamma(color.y())
