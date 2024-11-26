@@ -2,11 +2,17 @@ module main
 import math
 
 fn new_sphere(center Point3, params Hittable_Params) Hittable {
+	r := math.max(0.0, params.radius)
+	rvec := Vec3.new(r, r, r)
+	c := Ray.new(center, (center - params.center2).negate())
+	box1 := AABB.new_from_points(c.at(0) - rvec, c.at(0) + rvec)
+	box2 := AABB.new_from_points(c.at(1) - rvec, c.at(1) + rvec)
 	return Hittable{
 		shape: Shape.sphere
-		center: Ray.new(center, params.center2 - center)
-		radius: math.max(0.0, params.radius)
+		center: c
+		radius: r
 		mat: params.mat
+		bbox: AABB.new_from_boxes(box1, box2)
 	}
 }
 

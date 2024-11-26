@@ -18,6 +18,7 @@ struct Hittable {
 	center Ray
 	radius f64
 	mat Material
+	bbox AABB
 }
 
 @[params]
@@ -39,9 +40,9 @@ fn Hittable.new(center Point3, params Hittable_Params) Hittable{
 }
 
 fn (h Hittable) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
-	match h.shape {
+	return match h.shape {
 		.sphere {
-			return h.hit_sphere(r, ray_t, mut rec)
+			h.hit_sphere(r, ray_t, mut rec)
 		}
 	}
 }
@@ -49,4 +50,10 @@ fn (h Hittable) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 fn (mut h Hit_Record) set_face_normal(r Ray, outward_normal Vec3) {
 	h.front_face = r.direction().dot(outward_normal) < 0
 	h.normal = if h.front_face {outward_normal} else {outward_normal.negate()}
+}
+
+fn (h Hittable) bounding_box() AABB{
+	return match h.shape {
+		.sphere {h.bbox}
+	}
 }

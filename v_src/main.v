@@ -35,6 +35,7 @@ fn main() {
 					)
 					world.add(Hittable.new(center,
 						center2: center + Vec3.new(0, random_double_bound(0, 0.5), 0)
+						radius: 0.2
 						mat: sphere_material
 					))
 				}
@@ -102,7 +103,7 @@ fn main() {
 
 	cam.aspect_ratio = 16.0/9.0
 	cam.image_width = 400
-	cam.samples_per_pixel = 3
+	cam.samples_per_pixel = 1
 	cam.max_depth = 30 
 
 	cam.vfov = 20
@@ -113,7 +114,7 @@ fn main() {
 	cam.defocus_angle = 0.6
 	cam.focus_dist = 10.0
 
-	cam.render(world).save_png("image3.png")
+	cam.render(world).save_png("image4.png")
 
 	//camera
 

@@ -75,5 +75,4 @@ fn (m Material) scatter_dielectric(r_in Ray, rec Hit_Record, mut attenuation Col
 fn (m Material) dielectric_reflectence(cosine f64, refraction_index f64) f64 {
 	r0 := math.pow((1.0 - refraction_index) / (1.0 + refraction_index), 2)
 	return (r0 + (1-r0)* math.pow((1-cosine), 5))
-
 }

@@ -8,7 +8,7 @@ struct Ray {
 
 @[params]
 struct Ray_Params {
-	tm f64 = 0
+	tm f64 = 0.0
 }
 
 fn Ray.new(origin Point3, direction Vec3, r Ray_Params) Ray {

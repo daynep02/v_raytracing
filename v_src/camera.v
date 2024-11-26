@@ -36,7 +36,7 @@ struct Image_S{
 	mut:
 	image gfx.Image
 }
-const num_threads = 8
+const num_threads = 10
 
 
 fn(c Camera) ray_color(r Ray, depth int, world Hittable_List) Color{
