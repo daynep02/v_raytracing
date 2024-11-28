@@ -15,8 +15,7 @@ fn main() {
 		albedo: Color.new(0.5, 0.5, 0.5)
 	)
 
-	world.add(Hittable.new(
-		center: Point3.new(0.0, -1000, 0.0),
+	world.add(Hittable.new(Point3.new(0.0, -1000, 0.0),
 		radius: 1000.0,
 		mat: ground_material
 	 ))
@@ -34,8 +33,9 @@ fn main() {
 						mat: EMaterial.lambertian
 						albedo: albedo
 					)
-					world.add(Hittable.new(
-						center: center,
+					center2 := center + Vec3.new(0, random_double_bound(0, 0.5), 0)
+					world.add(Hittable.new(center,
+						center2: center2
 						mat: sphere_material
 						radius: 0.2
 					))
@@ -50,8 +50,7 @@ fn main() {
 						fuzz: fuzz
 					) 
 
-					world.add(Hittable.new(
-						center: center,
+					world.add(Hittable.new(center,
 						radius: 0.2,
 						mat: sphere_material
 					 ))
@@ -61,8 +60,7 @@ fn main() {
 						mat: EMaterial.dielectric
 						refraction_index: 1.5
 					)
-					world.add(Hittable.new(
-						center: center,
+					world.add(Hittable.new(center,
 						radius: 0.2,
 						mat: sphere_material
 					 ))
@@ -75,8 +73,7 @@ fn main() {
 		mat: EMaterial.dielectric
 		refraction_index: 1.5
 	)
-	world.add(Hittable.new(
-		center: Point3.new(0.0, 1.0, 0.0),
+	world.add(Hittable.new(Point3.new(0.0, 1.0, 0.0),
 		radius: 1.0,
 		mat: material1
 	 ))
@@ -86,8 +83,7 @@ fn main() {
 		albedo: Color.new(0.4, 0.2, 0.1)
 	)
 
-	world.add(Hittable.new(
-		center: Point3.new(-4.0, 1.0, 0.0),
+	world.add(Hittable.new(Point3.new(-4.0, 1.0, 0.0),
 		radius: 1.0,
 		mat: material2
 	 ))
@@ -97,8 +93,7 @@ fn main() {
 		albedo: Color.new(0.4, 0.2, 0.1),
 		fuzz: 0.0
 	)
-	world.add(Hittable.new(
-		center: Point3.new(4.0, 1.0, 0.0),
+	world.add(Hittable.new(Point3.new(4.0, 1.0, 0.0),
 		radius: 1.0,
 		mat: material3
 	 ))

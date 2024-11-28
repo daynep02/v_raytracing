@@ -15,7 +15,7 @@ enum Shape {
 @[noinit]
 struct Hittable {
 	shape Shape
-	center Point3
+	center Ray
 	radius f64
 	mat Material
 }
@@ -23,7 +23,7 @@ struct Hittable {
 @[params]
 struct Hittable_Params  {
 	shape Shape = Shape.sphere
-	center Point3 = Point3.new(0,0,0)
+	center2 Point3 = Vec3.new(0,0,0)
 	mat Material = Material.new(
 		mat: EMaterial.lambertian
 		albedo: Color.new(0.5, 0.5, 0.5)
@@ -32,9 +32,9 @@ struct Hittable_Params  {
 }
 
 
-fn Hittable.new(params Hittable_Params) Hittable{
+fn Hittable.new(center1 Point3, params Hittable_Params) Hittable{
 	return match params.shape{
-		.sphere{ new_sphere(params)}	
+		.sphere{ new_sphere(center1, params)}	
 	}
 }
 
