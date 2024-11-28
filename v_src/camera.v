@@ -154,9 +154,8 @@ fn (c Camera) get_ray(i int, j int) Ray {
 	ray_origin := if c.defocus_angle <= 0.0 {c.center} else {c.defocus_disk_sample()}
 	ray_direction := pixel_sample - ray_origin
 
-	ray_time := random_double()
 
-	return Ray.new(ray_origin, ray_direction, tm: ray_time)
+	return Ray.new(ray_origin, ray_direction)
 }
 
 fn (c Camera) defocus_disk_sample() Point3{
