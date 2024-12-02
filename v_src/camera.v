@@ -36,16 +36,16 @@ struct Image_S{
 	mut:
 	image gfx.Image
 }
-const num_threads = 8
+const num_threads = 10
 
 
-fn(c Camera) ray_color(r Ray, depth int, world Hittable_List) Color{
+fn(c Camera) ray_color(r Ray, depth int, world Bvh_node) Color{
 	mut rec := Hit_Record{}
 	if depth <= 0 {
 		return Color.new(0,0,0)
 	}
 
-	if world.hit(r, Interval.new(0.001, infinity), mut rec) {
+	if world.hit(r, mut Interval.new(0.001, infinity), mut rec) {
 		mut scattered := Ray{}
 		mut attenuation := Color{}
 		if rec.mat.scatter(r, rec, mut attenuation, mut scattered) {
@@ -106,7 +106,7 @@ fn (mut c Camera) initialize() {
 
 }
 
-fn (c Camera) multi_render(shared image Image_S, world Hittable_List, thread_num int) {
+fn (c Camera) multi_render(shared image Image_S, world Bvh_node, thread_num int) {
 	for j in 0..c.image_height  {
 		for i in 0..c.image_width{
 			if (i + j) % num_threads != thread_num {
@@ -125,7 +125,7 @@ fn (c Camera) multi_render(shared image Image_S, world Hittable_List, thread_num
 	}
 }
 
-fn (mut c Camera) render(world Hittable_List) gfx.Image{
+fn (mut c Camera) render(world Bvh_node) gfx.Image{
 	c.initialize()
 
 	shared image := Image_S{

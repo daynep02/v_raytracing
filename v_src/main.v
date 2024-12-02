@@ -9,17 +9,7 @@ fn main() {
 
 
 	mut world := Hittable_List{}
-
-	ground_material := Material.new(
-		mat: EMaterial.lambertian
-		albedo: Color.new(0.5, 0.5, 0.5)
-	)
-
-	world.add(Hittable.new(Point3.new(0.0, -1000, 0.0),
-		radius: 1000.0,
-		mat: ground_material
-	 ))
-
+	/*
 	for a in -11..11 {
 		for b in -11..11{
 			choose_mat := random_double()
@@ -34,8 +24,7 @@ fn main() {
 						albedo: albedo
 					)
 					center2 := center + Vec3.new(0, random_double_bound(0, 0.5), 0)
-					world.add(Hittable.new(center,
-						center2: center2
+					world.add(new_moving_sphere(center, center2,
 						mat: sphere_material
 						radius: 0.2
 					))
@@ -50,7 +39,7 @@ fn main() {
 						fuzz: fuzz
 					) 
 
-					world.add(Hittable.new(center,
+					world.add(new_sphere(center,
 						radius: 0.2,
 						mat: sphere_material
 					 ))
@@ -60,7 +49,7 @@ fn main() {
 						mat: EMaterial.dielectric
 						refraction_index: 1.5
 					)
-					world.add(Hittable.new(center,
+					world.add(new_sphere(center,
 						radius: 0.2,
 						mat: sphere_material
 					 ))
@@ -68,6 +57,7 @@ fn main() {
 			}
 		}
 	}
+	*/
 
 	material1 := Material.new(
 		mat: EMaterial.dielectric
@@ -97,6 +87,17 @@ fn main() {
 		radius: 1.0,
 		mat: material3
 	 ))
+	ground_material := Material.new(
+		mat: EMaterial.lambertian
+		albedo: Color.new(0.5, 1.5, 0.5)
+	)
+
+	world.add(Hittable.new(Point3.new(0.0, -1000, 0.0),
+		radius: 1000.0,
+		mat: ground_material
+	 ))
+
+	world2 := Bvh_node.new_from_list(world)
 
 
 	
@@ -104,8 +105,8 @@ fn main() {
 
 	cam.aspect_ratio = 16.0/9.0
 	cam.image_width = 400
-	cam.samples_per_pixel = 3
-	cam.max_depth = 30 
+	cam.samples_per_pixel = 100
+	cam.max_depth = 50
 
 	cam.vfov = 20
 	cam.lookfrom = Point3.new(13.0, 2.0, 3.0)
@@ -115,7 +116,7 @@ fn main() {
 	cam.defocus_angle = 0.6
 	cam.focus_dist = 10.0
 
-	cam.render(world).save_png("image3.png")
+	cam.render(world2).save_png("image3.png")
 
 	//camera
 
