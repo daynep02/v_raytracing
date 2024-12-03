@@ -42,5 +42,5 @@ fn (i Interval) expand(delta f64) Interval{
 	return Interval.new(i.min - padding, i.max + padding)
 }
 
-const empty := Interval.new(math.inf(1), math.inf(-1))
-const universe := Interval.new(math.inf(-1), math.inf(1))
+const empty_interval := Interval.new(math.inf(1), math.inf(-1))
+const universe_interval := Interval.new(math.inf(-1), math.inf(1))

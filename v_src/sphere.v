@@ -1,14 +1,14 @@
 module main
 import math
 
-fn new_sphere(center1 Point3, params Hittable_Params) Hittable {
+fn new_sphere(center Point3, params Hittable_Params) Hittable {
 	rvec := Vec3.new(params.radius, params.radius, params.radius)
 	return Hittable{
 		shape: Shape.sphere
 		radius: math.max(0.0, params.radius)
-		center: Ray.new(center1, Vec3.new(0,0,0))
+		center: Ray.new(center, Vec3.new(0,0,0))
 		mat: params.mat
-		bbox: Aabb.new_from_points(center1 - rvec, center1 + rvec)
+		bbox: Aabb.new_from_points(center - rvec, center + rvec)
 	}
 }
 
@@ -52,6 +52,13 @@ fn (s Hittable) hit_sphere(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 	rec.p = r.at(rec.t)
 	outward_normal := (rec.p - current_center).scale(1.0/s.radius)
 	rec.set_face_normal(r, outward_normal)
+	rec.u, rec.v = get_sphere_uv(outward_normal, rec.u, rec.v)
 	rec.mat = s.mat
 	return true
+}
+fn get_sphere_uv(p Point3,u f64, v f64) (f64, f64){
+	theta:= math.acos(-p.y())
+	phi := math.atan2(-p.z(), p.x()) + math.pi
+
+	return phi / (2*math.pi), theta / math.pi
 }

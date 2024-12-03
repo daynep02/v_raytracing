@@ -106,7 +106,7 @@ fn (mut c Camera) initialize() {
 
 }
 
-fn (c Camera) multi_render(shared image Image_S, world Bvh_node, thread_num int) {
+fn (c Camera) multi_render(shared image Image_S, world Bvh_node, thread_num int, shared pct Pct) {
 	for j in 0..c.image_height  {
 		for i in 0..c.image_width{
 			if (i + j) % num_threads != thread_num {
@@ -121,10 +121,19 @@ fn (c Camera) multi_render(shared image Image_S, world Bvh_node, thread_num int)
 			lock image{ 
 				image.image.set_xy(i, j, gfx.Color.new(linear_to_gamma(pixel_color.x()), linear_to_gamma(pixel_color.y()), linear_to_gamma(pixel_color.z())))
 			}
+			lock pct {
+				pct.x++
+				pct_complete := int(100.0 * f64(pct.x)/ f64(c.image_height * c.image_width))
+				print("\r${pct_complete}% completed")
+			}
 		}
 	}
 }
 
+struct Pct {
+	mut:
+	x int
+}
 fn (mut c Camera) render(world Bvh_node) gfx.Image{
 	c.initialize()
 
@@ -133,8 +142,11 @@ fn (mut c Camera) render(world Bvh_node) gfx.Image{
 	}
 
 	mut threads := []thread{}
+	shared pct := Pct {
+		x: 0
+	}
 	for i in 0..num_threads{
-		threads << spawn c.multi_render(shared image, world, i)
+		threads << spawn c.multi_render(shared image, world, i, shared pct)
 	}
 
 	threads.wait()

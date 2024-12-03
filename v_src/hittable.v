@@ -5,6 +5,8 @@ mut:
 	normal Vec3
 	t f64
 	front_face bool
+	u f64
+	v f64
 	mat Material
 }
 
@@ -18,6 +20,7 @@ struct Hittable {
 	center Ray
 	radius f64
 	mat Material
+	u f64
 	bbox Aabb
 }
 

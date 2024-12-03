@@ -23,6 +23,7 @@ fn (mut hl Hittable_List) add(object Hittable) {
 
 fn (mut hl Hittable_List) add_list(objects Hittable_List) {
 	hl.objects << objects.objects
+	hl.bbox = Aabb.new_from_aabb(hl.bbox, objects.bbox)
 }
 
 fn (hl Hittable_List) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {

@@ -35,7 +35,8 @@ fn (a Aabb) axis_interval(n int) &Interval {
 	else {return &a.x}
 }
 
-fn (a Aabb) hit(r Ray, mut ray_t Interval) bool {
+fn (a Aabb) hit(r Ray, ray_ta Interval) bool {
+	mut ray_t := ray_ta
 	ray_orig := r.origin()
 	ray_dir := r.direction()
 
@@ -60,3 +61,15 @@ fn (a Aabb) hit(r Ray, mut ray_t Interval) bool {
 	}
 	return true
 }
+
+fn (a Aabb) longest_axis() int {
+	if a.x.size() > a.y.size() {
+		return if a.x.size() > a.z.size() {0} else {2}
+	}
+	else {
+		return if a.y.size() > a.z.size() {1} else {2}
+	}
+}
+
+const empty_aabb := Aabb.new(empty_interval, empty_interval, empty_interval)
+const universe_aabb :=  Aabb.new(universe_interval, universe_interval, universe_interval)
