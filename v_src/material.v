@@ -10,6 +10,7 @@ struct Material {
 	albedo 	 Color
 	fuzz f64
 	refraction_index f64
+	tex Texture
 }
 
 @[params]
@@ -18,6 +19,7 @@ struct Material_Params {
 	albedo Color = Color.new(1.0, 1.0, 1.0)
 	fuzz f64 = 0.0
 	refraction_index f64 = 1.0
+	tex ?Texture = none
 }
 
 
@@ -27,6 +29,7 @@ fn Material.new(mp Material_Params) Material {
 		albedo: mp.albedo
 		fuzz: if mp.fuzz < 1.0 {mp.fuzz} else {1.0} 
 		refraction_index: mp.refraction_index 
+		tex: if c := mp.tex { c } else { Solid_Color.new(mp.albedo) }
 	}
 }
 
@@ -45,7 +48,7 @@ fn (l Material) scatter_lambertian(r_in Ray, rec Hit_Record, mut attenuation Col
 		scatter_direction = rec.normal
 	}
 	scattered = Ray.new(rec.p, scatter_direction, tm: r_in.time())
-	attenuation = l.albedo
+	attenuation = l.tex.value(rec.u, rec.v, rec.p)
 	return true
 }
 

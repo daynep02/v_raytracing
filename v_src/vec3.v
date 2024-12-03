@@ -23,6 +23,10 @@ fn (v Vec3) z() f64 { return v.e[2]}
 
 fn (v Vec3) at(i int) f64 { return v.e[i] }
 
+fn (v Vec3) index(i int) f64 {
+	return v.e[i]
+}
+
 fn (v Vec3) length() f64{
 	return math.sqrt(v.length_squared())
 }

@@ -18,3 +18,8 @@ fn random_double() f64 {
 fn random_double_bound(min f64, max f64) f64{
 	return min + ((max-min) * random_double())
 }
+
+@[inline]
+fn random_int(min int, max int) int{
+	return int(random_double_bound(f64(min), f64(max)))
+}
