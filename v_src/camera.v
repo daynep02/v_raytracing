@@ -30,13 +30,14 @@ pub mut:
 
 	defocus_angle f64 = 0.0
 	focus_dist f64 = 10.0
+	background Color
 }
 
 struct Image_S{
 	mut:
 	image gfx.Image
 }
-const num_threads = 10
+const num_threads = 14
 
 
 fn(c Camera) ray_color(r Ray, depth int, world Hittable_List) Color{
@@ -45,19 +46,28 @@ fn(c Camera) ray_color(r Ray, depth int, world Hittable_List) Color{
 		return Color.new(0,0,0)
 	}
 
-	if world.hit(r, Interval.new(0.001, infinity), mut rec) {
-		mut scattered := Ray{}
-		mut attenuation := Color{}
-		if rec.mat.scatter(r, rec, mut attenuation, mut scattered) {
-			return attenuation * c.ray_color(scattered, depth-1, world)
-		}
-		return Color.new(0,0,0)
+
+	if !world.hit(r, Interval.new(0.001, infinity), mut rec) {
+		return c.background
 	}
 
+	mut scattered := Ray{}
+	mut attenuation := Color{}
+	color_from_emission := rec.mat.emitted(rec.u, rec.v, rec.p)
+
+	if !rec.mat.scatter(r, rec, mut attenuation, mut scattered) {
+		return color_from_emission
+	}
+
+	color_from_scatter := attenuation * c.ray_color(scattered, depth-1, world)
+	
+	return color_from_emission + color_from_scatter
+	
+/*
 	unit_direction := unit_vector(r.direction())
 	a := (unit_direction.y() + 1.0) * 0.5
 	return Color.new(1.0, 1.0, 1.0).scale(1.0-a) + Color.new(0.5, 0.7, 1.0).scale(a)
-	
+*/	
 }
 
 @[params]

@@ -21,7 +21,7 @@ struct Hittable {
 	bbox Aabb
 }
 */
-type Hittable = Sphere | Quad | Bvh_node
+type Hittable = Sphere | Quad | Bvh_node | Hittable_List
 
 @[params]
 struct Hittable_Params  {
@@ -30,10 +30,11 @@ struct Hittable_Params  {
 }
 
 fn (h Hittable) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
-	match h{
-		Sphere { return h.hit(r, ray_t, mut rec) }
-		Quad {return h.hit(r, ray_t, mut rec)}
-		Bvh_node {return h.hit(r, ray_t, mut rec)}
+	return match h{
+		Sphere {h.hit(r, ray_t, mut rec) }
+		Quad {h.hit(r, ray_t, mut rec)}
+		Bvh_node {h.hit(r, ray_t, mut rec)}
+		Hittable_List {h.hit(r, ray_t, mut rec)}
 	}
 }
 

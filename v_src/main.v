@@ -74,6 +74,7 @@ fn bouncing_spheres() {
 	cam.image_width = 400
 	cam.samples_per_pixel = 10
 	cam.max_depth = 30 
+	cam.background = Color.new(0.7, 0.8, 1.0)
 
 	cam.vfov = 20
 	cam.lookfrom = Point3.new(13.0, 2.0, 3.0)
@@ -98,6 +99,7 @@ fn checkered_spheres() {
 	cam.image_width = 400
 	cam.samples_per_pixel = 100
 	cam.max_depth = 50
+	cam.background = Color.new(0.7, 0.8, 1.0)
 
 	cam.vfov = 20
 	cam.lookfrom = Point3.new(13,2,3)
@@ -121,6 +123,7 @@ fn earth() {
 	cam.image_width = 400
 	cam.samples_per_pixel = 100
 	cam.max_depth = 50
+	cam.background = Color.new(0.7, 0.8, 1.0)
 
 	cam.vfov = 20
 	cam.lookfrom = Point3.new(0,0,12)
@@ -144,6 +147,7 @@ fn perlin_spheres() {
 	cam.image_width = 400
 	cam.samples_per_pixel = 100
 	cam.max_depth = 50
+	cam.background = Color.new(0.7, 0.8, 1.0)
 
 	cam.vfov = 20
 	cam.lookfrom = Point3.new(13, 2, 3)
@@ -164,15 +168,17 @@ fn quads() {
 
 	world.add(Quad.new(Point3.new(-3, -2, 5), Vec3.new(0, 0, -4), Vec3.new(0, 4, 0), left_red))
 	world.add(Quad.new(Point3.new(-2, -2, 0), Vec3.new(4, 0, 0), Vec3.new(0, 4, 0), back_green))
-	world.add(Quad.new(Point3.new(3, -2, 1), Vec3.new(0, 0, 4), Vec3.new(0, 0, 4), upper_orange))
+	world.add(Quad.new(Point3.new(3, -2, 1), Vec3.new(0, 0, 4), Vec3.new(0, 4, 0), right_blue))
+	world.add(Quad.new(Point3.new(-2, 3, 1), Vec3.new(4, 0, 0), Vec3.new(0, 0, 4), upper_orange))
 	world.add(Quad.new(Point3.new(-2, -3, 5), Vec3.new(4, 0, 0), Vec3.new(0, 0, -4), lower_teal))
 
 	mut cam := Camera.new()
 
 	cam.aspect_ratio      = 1.0;
     cam.image_width       = 400;
-    cam.samples_per_pixel = 100;
-    cam.max_depth         = 50;
+    cam.samples_per_pixel = 10;
+    cam.max_depth         = 10;
+	cam.background = Color.new(0.7, 0.8, 1.0)
 
     cam.vfov     = 80;
     cam.lookfrom = Point3.new(0,0,9);
@@ -181,9 +187,38 @@ fn quads() {
 
     cam.defocus_angle = 0;
 
-	cam.render(world)
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(world))).save_png("quads.png")
 
 }
+
+fn simple_light() {
+	mut world := Hittable_List{}
+
+	pertext := Noise_Texture.new()
+	world.add(Sphere.new(Point3.new(0, -1000, 0), radius: 1000, mat: Lambertian.new(pertext)))
+	world.add(Sphere.new(Point3.new(0, 2, 0), radius: 2, mat: Lambertian.new(pertext)))
+
+	difflight := Diffuse_Light.new_color(Color.new(4, 4, 4))
+	world.add(Quad.new(Point3.new(3,1,-2), Vec3.new(2, 0, 0), Vec3.new(0, 2, 0), difflight))
+
+	mut cam := Camera.new()
+
+	cam.aspect_ratio = 16.0 / 9.0
+	cam.image_width = 400
+	cam.samples_per_pixel = 100
+	cam.max_depth = 50
+	cam.background = Color.new(0, 0, 0)
+
+	cam.vfov = 20
+	cam.lookfrom = Point3.new(26, 3, 6)
+	cam.lookat = Point3.new(0, 2, 0)
+	cam.vup = Vec3.new(0, 1, 0)
+	cam.defocus_angle = 0
+
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(world))).save_png("simple_light.png")
+}
+
+fn cornell_box() {}
 fn main() {
 	x := 5
 	match x {
@@ -192,6 +227,7 @@ fn main() {
 		3 {earth()}
 		4 {perlin_spheres()}
 		5 {quads()}
+		6 {simple_light()}
 		else{}
 	}
 	println("\nDone\n")

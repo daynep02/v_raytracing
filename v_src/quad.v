@@ -48,7 +48,7 @@ fn (q Quad) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 
 	intersection := r.at(t)
 	planar_hitpt_vector := intersection - q.q
-	alpha := q.w.dot(planar_hitpt_vector.cross(q.u))
+	alpha := q.w.dot(planar_hitpt_vector.cross(q.v))
 	beta := q.w.dot(q.u.cross(planar_hitpt_vector))
 
 	if !q.is_interior(alpha, beta, mut rec) {return false}

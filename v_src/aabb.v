@@ -75,9 +75,9 @@ fn (a Aabb) longest_axis() int {
 
 fn (mut a Aabb) pad_to_minimums() {
 	delta := 0.0001
-	if (a.x.size() < delta) {a.x = a.x.expand(delta)}
-	if (a.y.size() < delta) {a.y = a.y.expand(delta)}
-	if (a.z.size() < delta) {a.z = a.z.expand(delta)}
+	if a.x.size() < delta {a.x = a.x.expand(delta)}
+	if a.y.size() < delta {a.y = a.y.expand(delta)}
+	if a.z.size() < delta {a.z = a.z.expand(delta)}
 }
 
 const empty_aabb := Aabb.new(empty_interval, empty_interval, empty_interval)

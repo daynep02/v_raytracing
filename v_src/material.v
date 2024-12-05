@@ -1,18 +1,4 @@
 import math
-enum EMaterial {
-	metal
-	lambertian
-	dielectric
-}
-
-@[params]
-struct Material_Params {
-	mat EMaterial = EMaterial.lambertian
-	albedo Color = Color.new(1.0, 1.0, 1.0)
-	fuzz f64 = 0.0
-	refraction_index f64 = 1.0
-	tex ?Texture = none
-}
 
 struct Lambertian {
 	tex Texture
@@ -27,7 +13,11 @@ struct Dielectric {
 	refraction_index f64
 }
 
-type Material = Lambertian | Metal | Dielectric
+struct Diffuse_Light {
+	tex Texture
+}
+
+type Material = Lambertian | Metal | Dielectric | Diffuse_Light
 
 
 fn Lambertian.new(tex Texture) Lambertian{
@@ -56,8 +46,16 @@ fn (m Material) scatter(r_in Ray, rec Hit_Record, mut attenuation Color, mut sca
 		Metal {m.scatter(r_in, rec, mut attenuation, mut scattered)}
 		Lambertian {m.scatter(r_in, rec, mut attenuation, mut scattered)}
 		Dielectric {m.scatter(r_in, rec, mut attenuation, mut scattered)}
+		else {false}
 	}
 }
+
+fn (m Material) emitted(u f64, v f64, p Point3) Color {
+	return match m {
+		Diffuse_Light {m.emitted(u, v, p)}
+		else {Color.new(0, 0, 0)}
+	}
+} 
 
 fn (l Lambertian) scatter(r_in Ray, rec Hit_Record, mut attenuation Color, mut scattered Ray) bool {
 	mut scatter_direction := rec.normal + random_unit_vector()
@@ -97,4 +95,16 @@ fn (m Dielectric) dielectric_reflectence(cosine f64, refraction_index f64) f64 {
 	r0 := math.pow((1.0 - refraction_index) / (1.0 + refraction_index), 2)
 	return (r0 + (1-r0)* math.pow((1-cosine), 5))
 
+}
+
+fn Diffuse_Light.new(tex Texture) Diffuse_Light {
+	return Diffuse_Light {tex: tex}
+}
+
+fn Diffuse_Light.new_color(emit Color) Diffuse_Light {
+	return Diffuse_Light.new(Solid_Color.new(emit))
+}
+
+fn (d Diffuse_Light) emitted(u f64, v f64, p Point3) Color {
+	return d.tex.value(u, v, p)
 }
