@@ -1,10 +1,16 @@
 module main
 import math
 
-fn new_sphere(center Point3, params Hittable_Params) Hittable {
+
+struct Sphere{
+	center Ray
+	radius f64
+	mat Material
+	bbox Aabb
+}
+fn Sphere.new(center Point3, params Hittable_Params) Sphere {
 	rvec := Vec3.new(params.radius, params.radius, params.radius)
-	return Hittable{
-		shape: Shape.sphere
+	return Sphere{
 		radius: math.max(0.0, params.radius)
 		center: Ray.new(center, Vec3.new(0,0,0))
 		mat: params.mat
@@ -12,13 +18,12 @@ fn new_sphere(center Point3, params Hittable_Params) Hittable {
 	}
 }
 
-fn new_moving_sphere(center1 Point3, center2 Point3, params Hittable_Params) Hittable{
+fn Sphere.new_moving(center1 Point3, center2 Point3, params Hittable_Params) Sphere{
 	rvec := Vec3.new(params.radius, params.radius, params.radius)
 	center := Ray.new(center1, center2 - center1)
 	box1 := Aabb.new_from_points(center.at(0) - rvec, center.at(0) + rvec)
 	box2 := Aabb.new_from_points(center.at(1) - rvec, center.at(1) + rvec)
-	return Hittable{
-		shape: Shape.sphere
+	return Sphere{
 		radius: math.max(0.0, params.radius)
 		center: center
 		mat: params.mat
@@ -27,7 +32,7 @@ fn new_moving_sphere(center1 Point3, center2 Point3, params Hittable_Params) Hit
 
 }
 
-fn (s Hittable) hit_sphere(r Ray, ray_t Interval, mut rec Hit_Record) bool {
+fn (s Sphere) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 	current_center := s.center.at(r.time())
 	oc := current_center - r.origin()
 	a := r.direction().length_squared()

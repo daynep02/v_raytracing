@@ -3,9 +3,9 @@ module main
 fn bouncing_spheres() {
 	mut world := Hittable_List{}
 
-	ground_material := Material.new(mat: EMaterial.lambertian, albedo: Color.new(0.5, 0.5, 0.5))
+	ground_material := Lambertian.new_color(Color.new(0.5, 0.5, 0.5))
 
-	world.add(Hittable.new(Point3.new(0.0, -1000, 0.0),
+	world.add(Sphere.new(Point3.new(0.0, -1000, 0.0),
 		radius: 1000.0,
 		mat: ground_material
 	 ))
@@ -18,12 +18,9 @@ fn bouncing_spheres() {
 
 				if choose_mat < 0.8 {
 					albedo := Color.random() * Color.random()
-					sphere_material := Material.new(
-						mat: EMaterial.lambertian
-						albedo: albedo
-					)
+					sphere_material := Lambertian.new_color(albedo)
 					center2 := center + Vec3.new(0, random_double_bound(0, 0.5), 0)
-					world.add(new_moving_sphere(center, center2,
+					world.add(Sphere.new_moving(center, center2,
 						mat: sphere_material
 						radius: 0.2
 					))
@@ -32,23 +29,16 @@ fn bouncing_spheres() {
 					albedo := Color.random_in_range(0.5, 1.0)
 					fuzz := random_double_bound(0.0, 0.5)
 
-					sphere_material := Material.new(
-						mat: EMaterial.metal
-						albedo: albedo
-						fuzz: fuzz
-					) 
+					sphere_material := Metal.new(albedo, fuzz) 
 
-					world.add(Hittable.new(center,
+					world.add(Sphere.new(center,
 						radius: 0.2,
 						mat: sphere_material
 					 ))
 				}
 				else {
-					sphere_material := Material.new(
-						mat: EMaterial.dielectric
-						refraction_index: 1.5
-					)
-					world.add(Hittable.new(center,
+					sphere_material := Dielectric.new( 1.5 )
+					world.add(Sphere.new(center,
 						radius: 0.2,
 						mat: sphere_material
 					 ))
@@ -57,31 +47,21 @@ fn bouncing_spheres() {
 		}
 	}
 
-	material1 := Material.new(
-		mat: EMaterial.dielectric
-		refraction_index: 1.5
-	)
-	world.add(Hittable.new(Point3.new(0.0, 1.0, 0.0),
+	material1 := Dielectric.new(1.5)
+	world.add(Sphere.new(Point3.new(0.0, 1.0, 0.0),
 		radius: 1.0,
 		mat: material1
 	 ))
 
-	material2 := Material.new(
-		mat: EMaterial.lambertian
-		albedo: Color.new(0.4, 0.2, 0.1)
-	)
+	material2 := Lambertian.new_color(Color.new(0.4, 0.2, 0.1))
 
-	world.add(Hittable.new(Point3.new(-4.0, 1.0, 0.0),
+	world.add(Sphere.new(Point3.new(-4.0, 1.0, 0.0),
 		radius: 1.0,
 		mat: material2
 	 ))
 
-	material3 := Material.new(
-		mat: EMaterial.metal
-		albedo: Color.new(0.4, 0.2, 0.1),
-		fuzz: 0.0
-	)
-	world.add(Hittable.new(Point3.new(4.0, 1.0, 0.0),
+	material3 := Metal.new(Color.new(0.4, 0.2, 0.1),  0.0)
+	world.add(Sphere.new(Point3.new(4.0, 1.0, 0.0),
 		radius: 1.0,
 		mat: material3
 	 ))
@@ -103,14 +83,14 @@ fn bouncing_spheres() {
 	cam.defocus_angle = 0.6
 	cam.focus_dist = 10.0
 
-	cam.render(Bvh_node.new_from_list(world)).save_png("bouncing_spheres.png")
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(world))).save_png("bouncing_spheres.png")
 }
 
 fn checkered_spheres() {
 	mut world := Hittable_List{}
 	checker := Checker_Texture.new_colors(0.32, Color.new(.2, .3, .1), Color.new(.9, .9, .9))
-	world.add(new_sphere(Point3.new(0, -10, 0), radius: 10, mat: Material.new(tex: checker)))
-	world.add(new_sphere(Point3.new(0, 10, 0), radius: 10, mat: Material.new(tex: checker)))
+	world.add(Sphere.new(Point3.new(0, -10, 0), radius: 10, mat: Lambertian.new(checker)))
+	world.add(Sphere.new(Point3.new(0, 10, 0), radius: 10, mat: Lambertian.new(checker)))
 
 	mut cam := Camera.new()
 
@@ -125,7 +105,7 @@ fn checkered_spheres() {
 	cam.vup = Vec3.new(0, 1, 0)
 
 	cam.defocus_angle = 0
-	cam.render(Bvh_node.new_from_list(world)).save_png("checkered_spheres.png")
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(world))).save_png("checkered_spheres.png")
 
 
 
@@ -133,8 +113,8 @@ fn checkered_spheres() {
 
 fn earth() {
 	earth_texture := Image_Texture.new("textures/earthmap.jpg")
-	earth_surface := Material.new(tex: earth_texture)
-	globe := new_sphere(Point3.new(0,0,0), radius: 2, mat: earth_surface)
+	earth_surface := Lambertian.new(earth_texture)
+	globe := Sphere.new(Point3.new(0,0,0), radius: 2, mat: earth_surface)
 
 	mut cam := Camera.new()
 	cam.aspect_ratio = 16.0 / 9.0	
@@ -149,14 +129,14 @@ fn earth() {
 
 	cam.defocus_angle = 0
 
-	cam.render(Bvh_node.new_from_list(Hittable_List{objects: [globe]})).save_png("globe_sphere.png")
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(Hittable_List{objects: [globe]}))).save_png("globe_sphere.png")
 }
 fn perlin_spheres() {
 	mut world := Hittable_List{}
 
-	pertext := Material.new(tex:Noise_Texture.new())
-	world.add(new_sphere(Point3.new(0,-1000, 0), radius: 1000, mat: pertext))
-	world.add(new_sphere(Point3.new(0,2, 0), radius: 2, mat: pertext))
+	pertext := Lambertian.new(Noise_Texture.new())
+	world.add(Sphere.new(Point3.new(0,-1000, 0), radius: 1000, mat: pertext))
+	world.add(Sphere.new(Point3.new(0,2, 0), radius: 2, mat: pertext))
 
 	mut cam := Camera.new()
 
@@ -171,13 +151,49 @@ fn perlin_spheres() {
 	cam.vup = Vec3.new(0, 1, 0)
 	cam.defocus_angle = 0
 
-	cam.render(Bvh_node.new_from_list(world)).save_png("perlin_spheres.png")
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(world))).save_png("perlin_spheres.png")
+}
+
+fn quads() {
+	mut world := Hittable_List{}
+	left_red := Lambertian.new_color(Color.new(1.0, 0.2, 0.2))
+	back_green := Lambertian.new_color(Color.new(0.2, 1.0, 0.2))
+	right_blue := Lambertian.new_color(Color.new(0.2, 0.2, 1.0))
+	upper_orange := Lambertian.new_color(Color.new(1.0, 0.5, 0.0))
+	lower_teal := Lambertian.new_color(Color.new(0.2, 0.8, 0.8))
+
+	world.add(Quad.new(Point3.new(-3, -2, 5), Vec3.new(0, 0, -4), Vec3.new(0, 4, 0), left_red))
+	world.add(Quad.new(Point3.new(-2, -2, 0), Vec3.new(4, 0, 0), Vec3.new(0, 4, 0), back_green))
+	world.add(Quad.new(Point3.new(3, -2, 1), Vec3.new(0, 0, 4), Vec3.new(0, 0, 4), upper_orange))
+	world.add(Quad.new(Point3.new(-2, -3, 5), Vec3.new(4, 0, 0), Vec3.new(0, 0, -4), lower_teal))
+
+	mut cam := Camera.new()
+
+	cam.aspect_ratio      = 1.0;
+    cam.image_width       = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth         = 50;
+
+    cam.vfov     = 80;
+    cam.lookfrom = Point3.new(0,0,9);
+    cam.lookat   = Point3.new(0,0,0);
+    cam.vup      = Vec3.new(0,1,0);
+
+    cam.defocus_angle = 0;
+
+	cam.render(world)
+
 }
 fn main() {
-	//bouncing_spheres()
-	//checkered_spheres()
-	//earth()
-	perlin_spheres()
+	x := 5
+	match x {
+		1 {bouncing_spheres()}
+		2 {checkered_spheres()}
+		3 {earth()}
+		4 {perlin_spheres()}
+		5 {quads()}
+		else{}
+	}
 	println("\nDone\n")
 
 

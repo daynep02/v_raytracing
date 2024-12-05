@@ -1,9 +1,8 @@
 import os
 import json
 struct Bvh_node {
-	left ?&Bvh_node
-	right ?&Bvh_node
-	object ?Hittable
+	left Hittable
+	right Hittable
 	bbox Aabb
 }
 
@@ -51,30 +50,19 @@ fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
 
 	if object_span == 1 {
 		left := objects[start]
-		right := objects[start]
 		return Bvh_node {
-			left: none
-			right: none
+			left: left
+			right: left 
 			bbox: bbox
-			object: objects[start]
 		}
 	}else if object_span == 2 {
-		left_object := objects[start]
-		right_object := objects[start+1]
+		left := objects[start]
+		right := objects[start+1]
 		return Bvh_node {
-			left: &Bvh_node{
-				left: none
-				right: none
-				bbox: left_object.bounding_box()
-				object: left_object
-			}
-			right: &Bvh_node {
-				left: none
-				right: none
-				bbox: right_object.bounding_box()
-				object: right_object
-			}
+			left: left
+			right: right 
 			bbox : bbox
+
 		}
 	}		
 	else {
@@ -83,10 +71,9 @@ fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
 		left := Bvh_node.new(mut objects, start, mid)
 		right := Bvh_node.new(mut objects, mid, end)
 		return Bvh_node {
-			left: &left
-			right: &right
+			left: left
+			right: right
 			bbox : Aabb.new_from_aabb(left.bounding_box(), right.bounding_box())
-			object: none
 		}
 	}
 }
@@ -96,10 +83,7 @@ fn (b Bvh_node) bounding_box() Aabb{
 }
 
 
-fn (b Bvh_node) hit( r Ray, mut ray_t Interval, mut rec Hit_Record) bool{
-	if  o := b.object {
-		return o.hit(r, ray_t, mut rec)
-	}
+fn (b Bvh_node) hit( r Ray, ray_t Interval, mut rec Hit_Record) bool{
 	if !b.bbox.hit(r, ray_t){
 		return false
 	}
@@ -108,12 +92,8 @@ fn (b Bvh_node) hit( r Ray, mut ray_t Interval, mut rec Hit_Record) bool{
 	mut hit_left := false
 	mut hit_right := false
 	
-	if l := b.left {
-		hit_left = l.hit(r, mut ray_t, mut rec)
-	}
-	if ri := b.right {
-		hit_right = ri.hit(r, mut Interval.new(ray_t.min, if hit_left {rec.t} else {ray_t.max}), mut rec)
-	}
+	hit_left = b.left.hit(r, ray_t, mut rec)
+	hit_right = b.right.hit(r, Interval.new(ray_t.min, if hit_left {rec.t} else {ray_t.max}), mut rec)
 	/*
 	if hit_left && hit_right {
 		//println("Hit left and right\nRay: ${r}, ray_t ${ray_t}, rec ${rec}")

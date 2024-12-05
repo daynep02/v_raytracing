@@ -10,42 +10,30 @@ mut:
 	mat Material
 }
 
-enum Shape {
-	sphere
-}
 
+/*
 @[noinit]
 struct Hittable {
 	shape Shape
 	center Ray
 	radius f64
 	mat Material
-	u f64
 	bbox Aabb
 }
+*/
+type Hittable = Sphere | Quad | Bvh_node
 
 @[params]
 struct Hittable_Params  {
-	shape Shape = Shape.sphere
-	mat Material = Material.new(
-		mat: EMaterial.lambertian
-		albedo: Color.new(0.5, 0.5, 0.5)
-	)
+	mat Material = Lambertian.new_color( Color.new(0.5, 0.5, 0.5))
 	radius f64 = 0.5
 }
 
-
-fn Hittable.new(center1 Point3, params Hittable_Params) Hittable{
-	return match params.shape{
-		.sphere{ new_sphere(center1, params)}	
-	}
-}
-
 fn (h Hittable) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
-	match h.shape {
-		.sphere {
-			return h.hit_sphere(r, ray_t, mut rec)
-		}
+	match h{
+		Sphere { return h.hit(r, ray_t, mut rec) }
+		Quad {return h.hit(r, ray_t, mut rec)}
+		Bvh_node {return h.hit(r, ray_t, mut rec)}
 	}
 }
 

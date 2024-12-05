@@ -21,10 +21,12 @@ fn Perlin.new() Perlin{
 }
 
 fn (p Perlin) noise(point Point3) f64{
-	u := point.x() - math.floor(point.x())
-	v := point.y() - math.floor(point.y())
-	w := point.z() - math.floor(point.z())
-
+	mut u := point.x() - math.floor(point.x())
+	mut v := point.y() - math.floor(point.y())
+	mut w := point.z() - math.floor(point.z())
+	u = u*u*(3-2*u)
+	v = v*v*(3-2*v)
+	w = w*w*(3-2*w)
 	i := int(4.0 * point.x()) & 255
 	j := int(4.0 * point.z()) & 255
 	k := int(4.0 * point.z()) & 255
@@ -33,7 +35,7 @@ fn (p Perlin) noise(point Point3) f64{
 	for di in 0..2{
 		for dj in 0..2{
 			for dk in 0..2 {
-				c[di][dj][dk] = p.randfloat[p.perm_x[(i + di) &255] ^ p.perm_y[(j + dj) & 255] ^ p.perm_z[(k + dk) & 255]]
+				c[di][dj][dk] = p.randfloat[p.perm_x[(i + di) & 255] ^ p.perm_y[(j + dj) & 255] ^ p.perm_z[(k + dk) & 255]]
 			}
 		}
 	}

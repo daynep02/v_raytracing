@@ -6,11 +6,13 @@ struct Aabb {
 }
 
 fn Aabb.new(x Interval, y Interval, z Interval) Aabb{
-	return Aabb {
+	mut a := Aabb {
 		x: x
 		y: y
 		z: z
 	}
+	a.pad_to_minimums()
+	return a
 }
 
 fn Aabb.new_from_points(a Point3, b Point3) Aabb{
@@ -69,6 +71,13 @@ fn (a Aabb) longest_axis() int {
 	else {
 		return if a.y.size() > a.z.size() {1} else {2}
 	}
+}
+
+fn (mut a Aabb) pad_to_minimums() {
+	delta := 0.0001
+	if (a.x.size() < delta) {a.x = a.x.expand(delta)}
+	if (a.y.size() < delta) {a.y = a.y.expand(delta)}
+	if (a.z.size() < delta) {a.z = a.z.expand(delta)}
 }
 
 const empty_aabb := Aabb.new(empty_interval, empty_interval, empty_interval)
