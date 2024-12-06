@@ -37,15 +37,15 @@ struct Image_S{
 	mut:
 	image gfx.Image
 }
-const num_threads = 14
+const num_threads = 200
 
 
 fn(c Camera) ray_color(r Ray, depth int, world Hittable_List) Color{
-	mut rec := Hit_Record{}
 	if depth <= 0 {
 		return Color.new(0,0,0)
 	}
 
+	mut rec := Hit_Record{}
 
 	if !world.hit(r, Interval.new(0.001, infinity), mut rec) {
 		return c.background
@@ -61,7 +61,7 @@ fn(c Camera) ray_color(r Ray, depth int, world Hittable_List) Color{
 
 	color_from_scatter := attenuation * c.ray_color(scattered, depth-1, world)
 	
-	return color_from_emission + color_from_scatter
+	return (color_from_emission + color_from_scatter)
 	
 /*
 	unit_direction := unit_vector(r.direction())

@@ -13,12 +13,11 @@ struct Quad {
 fn Quad.new(q Point3, u Vec3, v Vec3, mat Material) Quad{
 	n := u.cross(v)
 	normal := unit_vector(n)
-	d := normal.dot(q)
 	return Quad {
 		q: q
 		u: u
 		v: v
-		d: d
+		d: normal.dot(q)
 		w: n.scale(1.0 / n.dot(n))
 		normal: normal
 		mat: mat

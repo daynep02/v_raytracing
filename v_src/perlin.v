@@ -30,7 +30,7 @@ fn (p Perlin) noise(point Point3) f64{
 	i := int(4.0 * point.x()) & 255
 	j := int(4.0 * point.z()) & 255
 	k := int(4.0 * point.z()) & 255
-	mut c := [2][2][2]f64
+	mut c := [2][2][2]f64{}
 
 	for di in 0..2{
 		for dj in 0..2{
@@ -64,9 +64,22 @@ fn trilinear_interp(c [2][2][2]f64, u f64, v f64, w f64) f64 {
 	for i in 0..2{
 		for j in 0..2{
 			for k in 0..2 {
-				accum += (i*u + (1-i)*(1-u)) * (j*v + (1-j)*(1-v)) * (k*w + (1-k)*(1-w)) * c[i][j][k];
+				accum = accum + ((i*u + (1-i)*(1-u)) * (j*v + (1-j)*(1-v)) * (k*w + (1-k)*(1-w)) * c[i][j][k]);
 			}
 		}
 	}
 	return accum
+}
+
+fn (p Perlin) turb(pi Point3, depth int) f64 {
+	mut accum := 0.0
+	mut temp_p := pi
+	mut weight := 1.0
+
+	for _ in 0..depth {
+		accum += weight * p.noise(temp_p)
+		weight *= 0.5
+		temp_p = temp_p.scale(2)
+	}
+	return math.abs(accum)
 }
