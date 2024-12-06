@@ -233,10 +233,13 @@ fn cornell_box() {
 	world.add(Quad.new(Point3.new(555, 555, 555), Vec3.new(-555, 0, 0), Vec3.new(0, 0, -555), white))
 	world.add(Quad.new(Point3.new(0, 0, 555), Vec3.new(555, 0, 0), Vec3.new(0, 555, 0), white))
 
+	world.add(box(Point3.new(130, 0, 65), Point3.new(295, 165, 230), white))
+	world.add(box(Point3.new(265, 0, 295), Point3.new(430, 330, 460), white))
+
 	mut cam := Camera.new()
 	cam.aspect_ratio = 1.0
 	cam.image_width = 600
-	cam.samples_per_pixel = 200
+	cam.samples_per_pixel = 100
 	cam.max_depth = 50
 	cam.background = Color.new(0.0, 0.0, 0)
 

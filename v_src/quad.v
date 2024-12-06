@@ -69,3 +69,23 @@ fn (q Quad) is_interior(a f64, b f64, mut rec Hit_Record) bool {
 	rec.v = b
 	return true
 }
+
+@[inline]
+fn box(a Point3, b Point3, mat Material) Hittable_List {
+	mut sides := Hittable_List{}
+
+	min := Point3.new(math.min(a.x(), b.x()), math.min(a.y(), b.y()), math.min(a.z(), b.z()))
+	max := Point3.new(math.max(a.x(), b.x()), math.max(a.y(), b.y()), math.max(a.z(), b.z()))
+
+	dx := Vec3.new(max.x() - min.x(), 0, 0)
+	dy := Vec3.new(0, max.y() - min.y(), 0)
+	dz := Vec3.new(0, 0, max.z() - min.z())
+
+	sides.add(Quad.new(Point3.new(min.x(), min.y(), max.z()), dx, dy, mat))
+	sides.add(Quad.new(Point3.new(max.x(), min.y(), max.z()), dz.negate(), dy, mat))
+	sides.add(Quad.new(Point3.new(max.x(), min.y(), min.z()), dx.negate(), dy, mat))
+	sides.add(Quad.new(Point3.new(min.x(), min.y(), min.z()), dz, dy, mat))
+	sides.add(Quad.new(Point3.new(min.x(), max.y(), max.z()), dx, dz.negate(), mat))
+	sides.add(Quad.new(Point3.new(min.x(), min.y(), min.z()), dx, dz, mat))
+	return sides
+}

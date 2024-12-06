@@ -80,5 +80,9 @@ fn (mut a Aabb) pad_to_minimums() {
 	if a.z.size() < delta {a.z = a.z.expand(delta)}
 }
 
+fn (bbox Aabb) add_vec3(offset Vec3) Aabb{
+	return Aabb.new(bbox.x.add_displacement(offset.x()), bbox.y.add_displacement( offset.y()), bbox.z.add_displacement(offset.z()))
+}
+
 const empty_aabb := Aabb.new(empty_interval, empty_interval, empty_interval)
 const universe_aabb :=  Aabb.new(universe_interval, universe_interval, universe_interval)

@@ -2,6 +2,7 @@ module main
 import math
 
 struct Vec3 {
+	mut:
 	e []f64 = [0.0, 0.0, 0.0]
 }
 

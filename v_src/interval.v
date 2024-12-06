@@ -42,5 +42,9 @@ fn (i Interval) expand(delta f64) Interval{
 	return Interval.new(i.min - padding, i.max + padding)
 }
 
+fn (i Interval) add_displacement(displacement f64) Interval {
+	return Interval.new(i.min + displacement, i.max + displacement)
+} 
+
 const empty_interval := Interval.new(math.inf(1), math.inf(-1))
 const universe_interval := Interval.new(math.inf(-1), math.inf(1))
