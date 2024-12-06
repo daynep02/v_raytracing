@@ -17,13 +17,13 @@ struct Image_Texture {
 
 struct Noise_Texture {
 	noise Perlin
+	scale f64
 }
 
 type Texture = Solid_Color | Checker_Texture | Image_Texture | Noise_Texture
 
 fn (t Texture) value(u f64, v f64, p Point3) Color{
 	return match t {
-
 		Solid_Color{ t.value(u, v, p) }
 		Checker_Texture { t.value(u, v, p) }
 		Image_Texture {t.value(u, v, p)}
@@ -89,12 +89,13 @@ fn (t Image_Texture) value(u f64, v f64, p Point3) Color{
 
 }
 
-fn Noise_Texture.new() Noise_Texture{
+fn Noise_Texture.new(scale f64) Noise_Texture{
 	return Noise_Texture {
 		noise: Perlin.new()
+		scale: scale
 	}
 }
 
 fn (n Noise_Texture) value(u f64, v f64, p Point3) Color {
-	return Color.new(1, 1, 1).scale(n.noise.noise(p))
+	return Color.new(1, 1, 1).scale(n.noise.turb(p, 7))
 }
