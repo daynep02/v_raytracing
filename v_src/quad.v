@@ -89,3 +89,26 @@ fn box(a Point3, b Point3, mat Material) Hittable_List {
 	sides.add(Quad.new(Point3.new(min.x(), min.y(), min.z()), dx, dz, mat))
 	return sides
 }
+
+@[inline]
+fn minecraft_box(a Point3, b Point3, top_tex Texture, side_tex Texture) Hittable_List {
+	mut sides := Hittable_List{}
+
+	top_mat := Lambertian.new(top_tex)
+	side_mat := Lambertian.new(side_tex)
+
+	min := Point3.new(math.min(a.x(), b.x()), math.min(a.y(), b.y()), math.min(a.z(), b.z()))
+	max := Point3.new(math.max(a.x(), b.x()), math.max(a.y(), b.y()), math.max(a.z(), b.z()))
+
+	dx := Vec3.new(max.x() - min.x(), 0, 0)
+	dy := Vec3.new(0, max.y() - min.y(), 0)
+	dz := Vec3.new(0, 0, max.z() - min.z())
+
+	sides.add(Quad.new(Point3.new(min.x(), min.y(), max.z()), dx, dy, side_mat)) // front
+	sides.add(Quad.new(Point3.new(max.x(), min.y(), max.z()), dz.negate(), dy, side_mat)) // right
+	sides.add(Quad.new(Point3.new(max.x(), min.y(), min.z()), dx.negate(), dy, side_mat)) // back
+	sides.add(Quad.new(Point3.new(min.x(), min.y(), min.z()), dz, dy, side_mat)) // left
+	sides.add(Quad.new(Point3.new(min.x(), max.y(), max.z()), dx, dz.negate(), top_mat)) // top 
+	sides.add(Quad.new(Point3.new(min.x(), min.y(), min.z()), dx, dz, side_mat)) // bottom
+	return sides
+}

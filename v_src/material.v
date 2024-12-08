@@ -16,12 +16,15 @@ struct Dielectric {
 struct Diffuse_Light {
 	tex Texture
 }
+struct Isotropic {
+	tex Texture
+}
 
-type Material = Lambertian | Metal | Dielectric | Diffuse_Light
+type Material = Lambertian | Metal | Dielectric | Diffuse_Light | Isotropic
 
 
 fn Lambertian.new(tex Texture) Lambertian{
-	return Lambertian { tex: tex }
+	return Lambertian { tex: &tex }
 }
 
 fn Lambertian.new_color(albedo Color) Lambertian {
@@ -40,12 +43,21 @@ fn Dielectric.new(refraction_index f64) Dielectric{
 	return Dielectric{refraction_index: refraction_index}
 }
 
+fn Isotropic.new(tex Texture) Isotropic{
+	return Isotropic {tex: tex}
+}
+
+fn Isotropic.new_color(albedo Color) Isotropic {
+	return Isotropic.new(Solid_Color.new(albedo))
+}
+
 
 fn (m Material) scatter(r_in Ray, rec Hit_Record, mut attenuation Color, mut scattered Ray) bool{
 	return match m {
 		Metal {m.scatter(r_in, rec, mut attenuation, mut scattered)}
 		Lambertian {m.scatter(r_in, rec, mut attenuation, mut scattered)}
 		Dielectric {m.scatter(r_in, rec, mut attenuation, mut scattered)}
+		Isotropic {m.scatter(r_in, rec, mut attenuation, mut scattered)}
 		else {false}
 	}
 }
@@ -97,7 +109,7 @@ fn (m Dielectric) dielectric_reflectence(cosine f64, refraction_index f64) f64 {
 
 }
 
-fn Diffuse_Light.new(tex Texture) Diffuse_Light {
+fn Diffuse_Light.new(tex &Texture) Diffuse_Light {
 	return Diffuse_Light {tex: tex}
 }
 
@@ -107,4 +119,10 @@ fn Diffuse_Light.new_color(emit Color) Diffuse_Light {
 
 fn (d Diffuse_Light) emitted(u f64, v f64, p Point3) Color {
 	return d.tex.value(u, v, p)
+}
+
+fn (i Isotropic) scatter(r_in Ray, rec Hit_Record, mut attenuation Color, mut scattered Ray) bool {
+	scattered = Ray.new(rec.p, random_unit_vector(), tm: r_in.time())
+	attenuation = i.tex.value(rec.u, rec.v, rec.p)
+	return true
 }

@@ -1,28 +1,19 @@
 import os
 import json
 struct Bvh_node {
-	left Hittable
-	right Hittable
+	left &Hittable
+	right &Hittable
 	bbox Aabb
 }
 
-fn Bvh_node.new_from_list(list Hittable_List) Bvh_node{
+fn Bvh_node.new_from_list(list Hittable_List) &Bvh_node{
 	mut cloned_objects := list.objects.clone()
 	node := Bvh_node.new(mut cloned_objects, 0, cloned_objects.len)
-	mut file := os.create('testfile.json') or {
-		return node
-	}
-
-	file.write_string(json.encode(node)) or {
-		file.close()
-		return node
-	}
-	file.close()
 	return node
 	
 }
 
-fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
+fn Bvh_node.new(mut objects []&Hittable, start int, end int) &Bvh_node{
 	//todo
 
 	mut bbox := empty_aabb
@@ -32,13 +23,13 @@ fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
 
 	axis := bbox.longest_axis()
 
-	box_x_compare  := fn (a &Hittable, b &Hittable) int {
+	box_x_compare  := fn (a &&Hittable, b &&Hittable) int {
 		return box_compare(a, b, 0)
 	}
-	box_y_compare  := fn (a &Hittable, b &Hittable) int {
+	box_y_compare  := fn (a &&Hittable, b &&Hittable) int {
 		return box_compare(a, b, 1)
 	}
-	box_z_compare  := fn (a &Hittable, b &Hittable) int {
+	box_z_compare  := fn (a &&Hittable, b &&Hittable) int {
 		return box_compare(a, b, 2)
 	}
 
@@ -50,7 +41,7 @@ fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
 
 	if object_span == 1 {
 		left := objects[start]
-		return Bvh_node {
+		return &Bvh_node {
 			left: left
 			right: left 
 			bbox: bbox
@@ -58,7 +49,7 @@ fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
 	}else if object_span == 2 {
 		left := objects[start]
 		right := objects[start+1]
-		return Bvh_node {
+		return &Bvh_node {
 			left: left
 			right: right 
 			bbox : bbox
@@ -70,7 +61,7 @@ fn Bvh_node.new(mut objects []Hittable, start int, end int) Bvh_node{
 		mid := start + object_span / 2
 		left := Bvh_node.new(mut objects, start, mid)
 		right := Bvh_node.new(mut objects, mid, end)
-		return Bvh_node {
+		return &Bvh_node {
 			left: left
 			right: right
 			bbox : Aabb.new_from_aabb(left.bounding_box(), right.bounding_box())
@@ -105,9 +96,9 @@ fn (b Bvh_node) hit( r Ray, ray_t Interval, mut rec Hit_Record) bool{
 	
 }
 
-fn box_compare(a Hittable, b Hittable, axis_index int) int {
-	a_axis_interval := a.bounding_box().axis_interval(axis_index)
-	b_axis_interval := b.bounding_box().axis_interval(axis_index)
+fn box_compare(a &&Hittable, b &&Hittable, axis_index int) int {
+	a_axis_interval := (*a).bounding_box().axis_interval(axis_index)
+	b_axis_interval := (*b).bounding_box().axis_interval(axis_index)
 	return if a_axis_interval.min < b_axis_interval.min {-1}
 	else {1}
 } 

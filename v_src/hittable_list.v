@@ -1,11 +1,11 @@
 module main
 struct Hittable_List {
 mut:
-	objects []Hittable = []Hittable{}
+	objects []&Hittable = []&Hittable{}
 	bbox Aabb
 }
 
-fn Hittable_List.new(object Hittable) Hittable_List{
+fn Hittable_List.new(object &Hittable) Hittable_List{
 	return Hittable_List {
 		objects: [object]
 		bbox: object.bounding_box()
@@ -13,16 +13,18 @@ fn Hittable_List.new(object Hittable) Hittable_List{
 }
 
 fn (mut hl Hittable_List) clear() {
-	hl.objects = []Hittable{}
+	hl.objects = []&Hittable{}
 }
 
-fn (mut hl Hittable_List) add(object Hittable) {
+fn (mut hl Hittable_List) add(object &Hittable) {
 	hl.objects << object
 	hl.bbox = Aabb.new_from_aabb(hl.bbox, object.bounding_box())
 }
 
 fn (mut hl Hittable_List) add_list(objects Hittable_List) {
-	hl.objects << objects.objects
+  for object in objects.objects {
+    hl.objects << object
+    }
 	hl.bbox = Aabb.new_from_aabb(hl.bbox, objects.bbox)
 }
 
@@ -42,6 +44,6 @@ fn (hl Hittable_List) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 	return hit_anything
 }
 
-fn (hl Hittable_List) boudning_box() Aabb {
+fn (hl Hittable_List) bounding_box() Aabb {
 	return hl.bbox
 }

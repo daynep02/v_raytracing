@@ -249,12 +249,86 @@ fn cornell_box() {
 	cam.vup = Vec3.new(0, 1, 0)
 
 	cam.defocus_angle = 0
-	cam.render(world).save_png("cornell_box2.png")
+	cam.render(Hittable_List.new(Bvh_node.new_from_list(world))).save_png("cornell_box2.png")
 }
 
+fn minecraft() {
+	mut world  := Hittable_List{}
+	brick_text := Image_Texture.new("textures/Minecraft-Bricks.jpg")
+	top_grass := Image_Texture.new("textures/grass_top.jpg")
+	side_grass := Image_Texture.new("textures/Grass_side.jpg")
+  for x := -20; x <= 20; x +=2 {
+    for z := -11; z < 12; z += 2 {
+      world.add(minecraft_box(Point3.new(x, 1, z), Point3.new(x - 2, -1, z + 2), top_grass, side_grass))
+    }
+  }
+  world.add(minecraft_box(Point3.new(-1, 3, -3), Point3.new(-3, 1, -1), brick_text, brick_text))
+  /*
+	world.add_list(minecraft_box(Point3.new(1, 1, -11), Point3.new(-1, -1, -9), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, -9), Point3.new(-1, -1, -7), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, -7), Point3.new(-1, -1, -5), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, -5), Point3.new(-1, -1, -3), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, -3), Point3.new(-1, -1, -1), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, -1), Point3.new(-1, -1, 1), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, 1), Point3.new(-1, -1, 3), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, 3), Point3.new(-1, -1, 5), top_grass, side_grass))
+	world.add_list(minecraft_box(Point3.new(1, 1, 5), Point3.new(-1, -1, 7), top_grass, side_grass))
+  */
+
+	mut cam := Camera.new()
+
+	cam.aspect_ratio = 16.0 / 9.0
+	cam.image_width = 400
+	cam.samples_per_pixel = 10
+	cam.max_depth = 5
+	cam.background = Color.new(0.7, 0.8, 1.0)
+
+	cam.vfov = 20
+	cam.lookfrom = Point3.new(26, 3, 6)
+	cam.lookat = Point3.new(0, 2, 0)
+	cam.vup = Vec3.new(0, 1, 0)
+	cam.defocus_angle = 0
+  world2 := Hittable_List.new(Bvh_node.new_from_list(world))
+	cam.render(world2).save_png("minecraft_beginnings.png")
+
+}
+
+fn creative_artifact() {
+  mut world := Hittable_List {}
+  
+	ground_material := Lambertian.new_color(Color.new(0.8, 0.5, 0.5))
+
+  water := Dielectric.new( 1.32 )
+	world.add(Sphere.new(Point3.new(0.0, -1000, 0.0),
+		radius: 1000.0,
+		mat: water
+	))
+
+	world.add(Sphere.new(Point3.new(0.0, -1000, 0.0),
+		radius: 999.0,
+		mat: ground_material
+	))
+  glass := Dielectric.new( 1.50 )
+	difflight := Diffuse_Light.new_color(Color.new(4, 4, 4))
+  world.add(Sphere.new(Point3.new(0.0, 0.0, 0.0), radius: .5, mat: difflight))
+
+  mut cam := Camera.new()
+	cam.aspect_ratio = 16.0 / 9.0
+	cam.image_width = 400
+	cam.samples_per_pixel = 1000
+	cam.max_depth = 50
+	cam.background = Color.new(0.01, 0.01, 0.01)
+
+	cam.vfov = 20
+	cam.lookfrom = Point3.new(26, 3, 6)
+	cam.lookat = Point3.new(0, 2, 0)
+	cam.vup = Vec3.new(0, 1, 0)
+	cam.defocus_angle = 0
+  cam.render(world).save_png("creative_artifact.png")
+}
 
 fn main() {
-	x := 7
+	x := 9
 	match x {
 		1 {bouncing_spheres()}
 		2 {checkered_spheres()}
@@ -263,7 +337,8 @@ fn main() {
 		5 {quads()}
 		6 {simple_light()}
 		7 {cornell_box()}
-		else{}
+    8 {creative_artifact()}
+		else{ minecraft()}
 	}
 	println("\nDone\n")
 

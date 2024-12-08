@@ -1,20 +1,24 @@
 import math
 import gfx
 
+@[heap]
 struct Solid_Color {
 	albedo Color
 }
 
+@[heap]
 struct Checker_Texture {
 	inv_scale f64
 	even Texture
 	odd Texture
 }
 
+@[heap]
 struct Image_Texture {
 	image gfx.Image
 }
 
+@[heap]
 struct Noise_Texture {
 	noise Perlin
 	scale f64

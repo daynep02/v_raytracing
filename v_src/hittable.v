@@ -12,17 +12,7 @@ mut:
 }
 
 
-/*
-@[noinit]
-struct Hittable {
-	shape Shape
-	center Ray
-	radius f64
-	mat Material
-	bbox Aabb
-}
-*/
-type Hittable = Sphere | Quad | Bvh_node | Hittable_List | Translate | Rotate_y
+type Hittable = Sphere | Quad | Bvh_node | Hittable_List | Translate | Rotate_y | Constant_medium
 
 struct Translate {
 	object Hittable
@@ -51,6 +41,7 @@ fn (h Hittable) hit(r Ray, ray_t Interval, mut rec Hit_Record) bool {
 		Hittable_List {h.hit(r, ray_t, mut rec)}
 		Translate {h.hit(r, ray_t, mut rec)}
 		Rotate_y {h.hit(r, ray_t, mut rec)}
+		Constant_medium {h.hit(r, ray_t, mut rec)}
 	}
 }
 
